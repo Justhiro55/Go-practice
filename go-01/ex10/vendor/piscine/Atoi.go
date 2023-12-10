@@ -33,7 +33,7 @@ func Atoi(s string) int {
             return 0
         } else {
 			tmp = int64(int64(result*10) + int64(char-'0'))
-			if tmp > 2147483647 {
+			if tmp > 2147483647 || tmp < -2147483648{
 				return 0
 			}
 			result = result*10 + int(char-'0')
