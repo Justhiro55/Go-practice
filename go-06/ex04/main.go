@@ -6,7 +6,7 @@
 /*   By: hhagiwar <hhagiwar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/03 12:48:04 by hhagiwar          #+#    #+#             */
-/*   Updated: 2023/12/28 11:15:08 by hhagiwar         ###   ########.fr       */
+/*   Updated: 2023/12/28 13:09:49 by hhagiwar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,28 +18,40 @@ import (
 )
 
 func main() {
-    if len(os.Args) != 2 {
-        fmt.Println("File name missing")
+    if len(os.Args) == 1 || os.Args[1] != "-c" {
+        fmt.Println("error")
         return
     }
-    filename := os.Args[1]
-    file, err := os.Open(filename)
-    if err != nil {
-        fmt.Println("Error:", err)
-        return
+    for i := 2; i < len(os.Args); i++ {
+        filename := os.Args[i]
+        file, err := os.Open(filename)
+        if err != nil {
+            continue
+        }
+        fmt.Println("==>", os.Args[i], "<==")
+        ztail(file)
+        defer file.Close()
+        if i + 1 < len(os.Args) {
+            fmt.Println("")
+        }
     }
-    defer file.Close()
+}
 
+func ztail(file *os.File) {
+    var lastLine string    
     buffer := make([]byte, 10240)
-    for {
-        n, err := file.Read(buffer)
-        if n == 0{
-            break
-        }
-        if err != nil{
-            break
-        }
-        fmt.Println(string(buffer[:n]))
-        fmt.Print(string(buffer))
+    
+    n, err := file.Read(buffer)
+    if err != nil || n == 0 {
+        fmt.Println("")
+        return
     }
+    for i := n - 1; i > 0; i-- {
+        if buffer[i] == '\n' {
+            fmt.Println(lastLine)
+            return
+        }
+        lastLine = string(buffer[i]) + lastLine
+    }
+    fmt.Println(lastLine)
 }
